@@ -1,0 +1,196 @@
+Sub headers()
+For Each ws In Worksheets
+
+'naming headers
+ws.Cells(1, 9).Value = "Ticker"
+ws.Cells(1, 10).Value = "Yearly Change"
+ws.Cells(1, 11).Value = "Percent Changed"
+ws.Cells(1, 12).Value = "Total Stock Volume"
+
+Next ws
+End Sub
+
+Sub SetTicker()
+For Each ws In Worksheets
+summary_row = 2
+Dim ticker As String
+l_row = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+'first ticker
+ticker = 0
+For j = 2 To l_row
+    'while the row is not the ticker, next otherwise
+    If ws.Cells(j, 1).Value <> ws.Cells(j - 1, 1) Then
+    ticker = ws.Cells(j, 1).Value
+    
+    'change the ticker to the newly found value
+    ws.Cells(summary_row, 9) = ticker
+    
+    'set the next ticker
+    summary_row = summary_row + 1
+    
+    End If
+    Next j
+    Next ws
+End Sub
+
+Sub YearlyDifference()
+For Each ws In Worksheets
+
+l_row = ws.Cells(Rows.Count, 1).End(xlUp).Row
+summary_row = 2
+Dim oPrice As Double
+Dim cPrice As Double
+Dim yearlyChange As Double
+
+
+
+
+'for each ticker
+    For j = 2 To l_row
+        'find openPrice
+        If ws.Cells(j, 1).Value <> ws.Cells(j - 1, 1) Then
+        oPrice = ws.Cells(j, 3).Value
+    
+        End If
+        
+        
+        'find close price
+        If ws.Cells(j, 1).Value <> ws.Cells(j + 1, 1) Then
+        cPrice = ws.Cells(j, 6).Value
+        
+        'formula to calculate yearly
+        yearlyChange = cPrice - oPrice
+        
+        
+        'display yearly total
+        ws.Cells(summary_row, 10).Value = yearlyChange
+        
+        
+        
+        
+        'set the next ticker
+        summary_row = summary_row + 1
+        End If
+        
+      Next j
+      Next ws
+        
+   End Sub
+        
+  Sub ConditionalFormatting()
+    For Each ws In Worksheets
+    
+    l_row = ws.Cells(Rows.Count, 1).End(xlUp).Row
+    
+        For j = 2 To l_row
+        
+        'conditional formatting
+        
+        If ws.Cells(j, 10).Value > 0 Then
+        ws.Range("J" & j).Interior.ColorIndex = 4
+                    
+        ElseIf ws.Cells(j, 10).Value < 0 Then
+        ws.Range("J" & j).Interior.ColorIndex = 3
+                    
+        Else: ws.Range("J" & j).Interior.ColorIndex = 2
+              
+        End If
+        
+        
+        
+        
+        
+        Next j
+        Next ws
+End Sub
+
+
+Sub PercentChanged()
+For Each ws In Worksheets
+
+l_row = ws.Cells(Rows.Count, 1).End(xlUp).Row
+summary_row = 2
+Dim oPrice As Double
+Dim cPrice As Double
+Dim percent As Double
+
+
+    For j = 2 To l_row
+    
+
+
+'find openPrice
+        
+        If ws.Cells(j, 1).Value <> ws.Cells(j - 1, 1).Value Then
+        oPrice = ws.Cells(j, 3).Value
+        End If
+        
+        'find close price
+        If ws.Cells(j, 1).Value <> ws.Cells(j + 1, 1).Value Then
+        cPrice = ws.Cells(j, 6).Value
+        
+        If oPrice = 0 Then
+        percent = 0
+    
+        Else: percent = (cPrice / oPrice) - 1
+        
+        'display percent
+        ws.Cells(summary_row, 11).Value = percent
+        
+        summary_row = summary_row + 1
+        End If
+        
+        
+
+'percent change statement to avoid dividing by Zero
+        
+        
+        
+        End If
+        Next j
+        
+       
+      ws.Range("K:K").NumberFormat = "0.00%"
+      
+      Next ws
+       
+
+    
+End Sub
+
+
+Sub TotalStock()
+For Each ws In Worksheets
+
+'make variables
+l_row = ws.Cells(Rows.Count, 1).End(xlUp).Row
+summary_row = 2
+Dim total As Double
+total = 0
+
+
+'loop through (j, l_row)
+For j = 2 To l_row
+    'pull the total amount of each ticker
+    If ws.Cells(j, 1).Value <> ws.Cells(j + 1, 1) Then
+    total = total + ws.Cells(j, 7).Value
+    
+    'display in column
+    ws.Cells(summary_row, 12).Value = total
+    
+    summary_row = summary_row + 1
+    total = 0
+    End If
+    
+    
+    Next j
+    
+    Next ws
+
+
+
+
+
+End Sub
+    
